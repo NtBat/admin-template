@@ -11,10 +11,10 @@ interface LayoutProps {
 export default function Layout(props: LayoutProps) { 
   return (
     <div className={`
-      flex h-screen w-screen 
+      dark flex h-screen w-screen 
     `}>
         <Sidebar />
-      <div className={`flex flex-col w-full p-7 bg-gray-300`}>
+      <div className={`flex flex-col w-full p-7 bg-gray-300 dark:bg-gray-800`}>
         <Header title={props.title} subtitle={props.subtitle} />
         <Content>
           {props.children}
