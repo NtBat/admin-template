@@ -1,9 +1,10 @@
 import { useState } from "react";
 import AuthInput from "../components/auth/AuthInput";
 
-import {GoogleIcon} from '../components/icons';
+import {AlertIcon, GoogleIcon} from '../components/icons';
 
 export default function Auth() {
+  const [error, setError] = useState(null);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,9 +12,18 @@ export default function Auth() {
   function submit() {
     if(mode === 'login' ) {
       console.log('login')
+      showError('An error occurred in login. Please try again.')
     } else {
       console.log('signup')
+      showError('An error occurred in signup. Please try again.')
     }
+  }
+
+  function showError(msg, time = 5000) {
+    setError(msg);
+    setTimeout(() => {
+      setError(null);
+    }, time);
   }
 
   return (
@@ -28,6 +38,20 @@ export default function Auth() {
         `}>
           {mode === 'login' ? 'Login' : 'Signup'}
         </h1>
+
+        {error ? (
+          <div className={`
+          bg-red-400 text-white py-3 px-5 my-2
+          border-2 border-red-700 rounded-lg
+          flex items-center gap-2
+        `}>
+          {AlertIcon()}
+          <span>{error}</span>
+        </div>
+        ) : (
+          null
+        )}
+
         <AuthInput 
           label="Email"
           type="email"
