@@ -5,20 +5,22 @@ import {AlertIcon, GoogleIcon} from '../components/icons';
 import useAuth from "../data/hook/useAuth";
 
 export default function Auth() {
-  const {user, loginGoogle} = useAuth();
+  const {signup, login, loginGoogle} = useAuth();
 
   const [error, setError] = useState(null);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  function submit() {
-    if(mode === 'login' ) {
-      console.log('login')
-      showError('An error occurred in login. Please try again.')
-    } else {
-      console.log('signup')
-      showError('An error occurred in signup. Please try again.')
+  async function submit() {
+    try {
+      if(mode === 'login' ) {
+        await login(email, password)
+      } else {
+        await signup(email, password)
+      }
+    } catch(e) {
+      showError(e?.message ?? 'Error unknown');
     }
   }
 
