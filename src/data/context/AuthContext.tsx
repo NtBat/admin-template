@@ -7,6 +7,7 @@ import User from '../../model/User';
 interface AuthContextProps {
   user?: User;
   loginGoogle?: () => Promise<void>;
+  logout?: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({});
@@ -28,7 +29,7 @@ function manageCookie(isLogged: boolean) {
   if(isLogged) {
     Cookies.set('admin-template-cod3r-auth', isLogged, { expires: 7 });
   } else {
-    Cookies.remove('admin-template-cod3r-auth')
+    Cookies.remove('admin-template-cod3r-auth');
   }
 }
 
@@ -52,23 +53,42 @@ export function AuthProvider(props) {
   }
 
   async function loginGoogle() {
-    const res = await firebase.auth().signInWithPopup(
-      new firebase.auth.GoogleAuthProvider()
-    )
+    try {
+      setLoading(true);
+      const res = await firebase.auth().signInWithPopup(
+        new firebase.auth.GoogleAuthProvider()
+      )
+  
+      configSection(res.user);
+      route.push('/');  
+    } finally {
+      setLoading(false);
+    }
+  }
 
-    configSection(res.user);
-    route.push('/');    
+  async function logout() {
+    try {
+      setLoading(true);
+      await firebase.auth().signOut();
+      await configSection(null);
+      route.push('/auth');
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
-    const cancel = firebase.auth().onIdTokenChanged(configSection);
-    return () => cancel();
-  }, [])
+    if(Cookies.get('admin-template-cod3r-auth')) {
+      const cancel = firebase.auth().onIdTokenChanged(configSection);
+      return () => cancel();
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={{
       user,
-      loginGoogle
+      loginGoogle,
+      logout
     }}>
       {props.children}
     </AuthContext.Provider>
